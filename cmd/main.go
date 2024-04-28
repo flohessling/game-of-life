@@ -11,7 +11,7 @@ import (
 func main() {
 	p := tea.NewProgram(model.InitialModel(), tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
-		fmt.Printf("this did not go well: %v", err)
+		fmt.Printf("this did not go well, skill issues: %v", err)
 		os.Exit(1)
 	}
 }

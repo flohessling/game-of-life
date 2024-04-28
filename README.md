@@ -6,6 +6,8 @@ It is written in Go and using bubbletea for the terminal rendering.
 
 ## TODOs
 
-- Check if `tea.WithAltScreen` screen size can be queried for the grid size.
+- Add a frame around the grid (using viewport maybe?).
 - Add helper menu to display `q` and `ctrl-c` to quit.
+- Add a pause button and a speed control.
+- Add a way to change the grid size.
 - Make the starting pattern configurable (currently it's hardcoded in the initial model).

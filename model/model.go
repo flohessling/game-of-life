@@ -13,6 +13,12 @@ type model struct {
 
 type tickMsg time.Time
 
+func tick() tea.Cmd {
+	return tea.Tick(time.Duration(80)*time.Millisecond, func(t time.Time) tea.Msg {
+		return tickMsg(t)
+	})
+}
+
 func InitialModel() model {
 	return model{
 		Width:  400,
@@ -31,7 +37,6 @@ func makeGrid(width, height int) [][]bool {
 	// --xx--
 	// -xx---
 	// --x---
-
 	grid[12][40] = true
 	grid[12][41] = true
 	grid[13][39] = true
@@ -96,12 +101,6 @@ func (m model) View() string {
 	}
 
 	return view
-}
-
-func tick() tea.Cmd {
-	return tea.Tick(time.Duration(80)*time.Millisecond, func(t time.Time) tea.Msg {
-		return tickMsg(t)
-	})
 }
 
 func (m model) updateGrid() model {
