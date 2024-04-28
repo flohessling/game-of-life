@@ -13,12 +13,6 @@ type model struct {
 
 type tickMsg time.Time
 
-func tick() tea.Cmd {
-	return tea.Tick(time.Duration(80)*time.Millisecond, func(t time.Time) tea.Msg {
-		return tickMsg(t)
-	})
-}
-
 func InitialModel() model {
 	return model{
 		Width:  400,
@@ -70,6 +64,46 @@ func makeGrid(width, height int) [][]bool {
 	return grid
 }
 
+func (m model) Init() tea.Cmd {
+	return tick()
+}
+
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "q", "ctrl+c":
+			return m, tea.Quit
+		}
+	case tickMsg:
+		return m.updateGrid(), tick()
+	}
+	return m, nil
+}
+
+func (m model) View() string {
+	var view string
+
+	for col := range m.Grid {
+		for row := range m.Grid[col] {
+			if m.Grid[col][row] {
+				view += "█"
+			} else {
+				view += " "
+			}
+		}
+		view += "\n"
+	}
+
+	return view
+}
+
+func tick() tea.Cmd {
+	return tea.Tick(time.Duration(80)*time.Millisecond, func(t time.Time) tea.Msg {
+		return tickMsg(t)
+	})
+}
+
 func (m model) updateGrid() model {
 	next := makeGrid(m.Width, m.Height)
 	for col := range m.Grid {
@@ -112,38 +146,4 @@ func (m model) countNeighbors(row, col int) int {
 	}
 
 	return count
-}
-
-func (m model) Init() tea.Cmd {
-	return tick()
-}
-
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "q", "ctrl+c":
-			return m, tea.Quit
-		}
-	case tickMsg:
-		return m.updateGrid(), tick()
-	}
-	return m, nil
-}
-
-func (m model) View() string {
-	var view string
-
-	for col := range m.Grid {
-		for row := range m.Grid[col] {
-			if m.Grid[col][row] {
-				view += "■"
-			} else {
-				view += " "
-			}
-		}
-		view += "\n"
-	}
-
-	return view
 }
