@@ -14,7 +14,7 @@ type model struct {
 type tickMsg time.Time
 
 func tick() tea.Cmd {
-	return tea.Tick(time.Duration(100)*time.Millisecond, func(t time.Time) tea.Msg {
+	return tea.Tick(time.Duration(80)*time.Millisecond, func(t time.Time) tea.Msg {
 		return tickMsg(t)
 	})
 }
@@ -43,6 +43,29 @@ func makeGrid(width, height int) [][]bool {
 	grid[13][39] = true
 	grid[13][40] = true
 	grid[14][40] = true
+
+	// evolution to empty grid
+	// -xxx-
+	// -x-x-
+	// -x-x-
+	// -----
+	// -x-x-
+	// -x-x-
+	// -xxx-
+	// grid[12][39] = true
+	// grid[12][40] = true
+	// grid[12][41] = true
+	// grid[13][39] = true
+	// grid[13][41] = true
+	// grid[14][39] = true
+	// grid[14][41] = true
+	// grid[16][39] = true
+	// grid[16][41] = true
+	// grid[17][39] = true
+	// grid[17][41] = true
+	// grid[18][39] = true
+	// grid[18][40] = true
+	// grid[18][41] = true
 
 	return grid
 }
