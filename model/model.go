@@ -3,12 +3,41 @@ package model
 import (
 	"time"
 
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
+
+type keyMap struct {
+	Help key.Binding
+	Quit key.Binding
+}
+
+var keys = keyMap{
+	Help: key.NewBinding(
+		key.WithKeys("?"),
+		key.WithKeys("?", "toggle help"),
+	),
+	Quit: key.NewBinding(
+		key.WithKeys("q", "ctrl+c", "esc"),
+		key.WithHelp("q", "quit"),
+	),
+}
+
+func (k keyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Help, k.Quit}
+}
+
+func (k keyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{{k.Help}, {k.Quit}}
+}
 
 type model struct {
 	Grid          [][]bool
 	Width, Height int
+	keys          keyMap
+	help          help.Model
 }
 
 type tickMsg time.Time
@@ -21,9 +50,11 @@ func tick() tea.Cmd {
 
 func InitialModel() model {
 	return model{
-		Width:  400,
-		Height: 60,
-		Grid:   makeGrid(400, 60),
+		Width:  100,
+		Height: 40,
+		Grid:   makeGrid(100, 40),
+		keys:   keys,
+		help:   help.New(),
 	}
 }
 
@@ -37,34 +68,11 @@ func makeGrid(width, height int) [][]bool {
 	// --xx--
 	// -xx---
 	// --x---
-	grid[12][40] = true
-	grid[12][41] = true
-	grid[13][39] = true
-	grid[13][40] = true
-	grid[14][40] = true
-
-	// evolution to empty grid
-	// -xxx-
-	// -x-x-
-	// -x-x-
-	// -----
-	// -x-x-
-	// -x-x-
-	// -xxx-
-	// grid[12][39] = true
-	// grid[12][40] = true
-	// grid[12][41] = true
-	// grid[13][39] = true
-	// grid[13][41] = true
-	// grid[14][39] = true
-	// grid[14][41] = true
-	// grid[16][39] = true
-	// grid[16][41] = true
-	// grid[17][39] = true
-	// grid[17][41] = true
-	// grid[18][39] = true
-	// grid[18][40] = true
-	// grid[18][41] = true
+	grid[19][50] = true
+	grid[19][51] = true
+	grid[20][49] = true
+	grid[20][50] = true
+	grid[21][50] = true
 
 	return grid
 }
@@ -75,19 +83,30 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.help.Width = msg.Width
+
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "q", "ctrl+c":
+		switch {
+		case key.Matches(msg, keys.Help):
+			m.help.ShowAll = true
+		case key.Matches(msg, keys.Quit):
 			return m, tea.Quit
 		}
+
 	case tickMsg:
 		return m.updateGrid(), tick()
 	}
+
 	return m, nil
 }
 
 func (m model) View() string {
 	var view string
+
+	frame := lipgloss.NewStyle().
+		BorderStyle(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("#25A065"))
 
 	for col := range m.Grid {
 		for row := range m.Grid[col] {
@@ -100,7 +119,17 @@ func (m model) View() string {
 		view += "\n"
 	}
 
-	return view
+	frameView := frame.Render(view)
+
+	title := lipgloss.NewStyle().
+		Width(100).
+		Align(lipgloss.Center).
+		Foreground(lipgloss.Color("#04B575")).
+		Render("conway's game of life")
+
+	helpView := m.help.View(m.keys)
+
+	return "\n" + title + "\n" + frameView + "\n" + "\n" + helpView + "\n"
 }
 
 func (m model) updateGrid() model {
