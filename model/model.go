@@ -88,8 +88,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, keys.Help):
-			m.help.ShowAll = true
 		case key.Matches(msg, keys.Quit):
 			return m, tea.Quit
 		}
@@ -127,7 +125,7 @@ func (m model) View() string {
 		Foreground(lipgloss.Color("#04B575")).
 		Render("conway's game of life")
 
-	helpView := m.help.View(m.keys)
+	helpView := m.help.ShortHelpView([]key.Binding{keys.Help, keys.Quit})
 
 	return "\n" + title + "\n" + frameView + "\n" + "\n" + helpView + "\n"
 }
