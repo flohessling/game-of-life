@@ -5,7 +5,7 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/flohessling/game-of-life/model"
+	"github.com/flohessling/game-of-life/internal/model"
 )
 
 func main() {
